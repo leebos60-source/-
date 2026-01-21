@@ -37,48 +37,35 @@ st.markdown('<p class="big-font">아버님, 지난 공사 데이터들을 분석
 with st.sidebar:
     st.header("📋 설정")
     
-    data_source = st.radio(
-        "데이터 소스 선택:",
-        ("샘플 데이터 사용", "내 엑셀 파일 업로드")
-    )
-    
-    df = None
-    
-    if data_source == "내 엑셀 파일 업로드":
-        uploaded_file = st.file_uploader("엑셀 파일 선택", type=['xlsx', 'xls', 'csv'])
-        if uploaded_file is not None:
-             try:
-                loader = FileDataLoader()
-                df = loader.load_from_file(uploaded_file)
-                st.success(f"{len(df)}건의 데이터를 불러왔습니다!")
-             except Exception as e:
-                st.error(f"오류: {e}")
-    else:
-        # 데이터 로드 (샘플)
-        def load_mock_data():
-            # 1. 1순위: 우리가 만든 통합 데이터 파일이 있으면 그걸 씁니다.
-            import os
-            local_file = '2024_전기공사_통합데이터.xlsx'
-            if os.path.exists(local_file):
-                try:
-                    return pd.read_excel(local_file)
-                except:
-                    pass
-            
-            # 2. 2순위: 파일이 없으면 그냥 가상 데이터를 만듭니다.
-            loader = MockDataLoader()
-            return loader.generate_mock_bids()
-        df = load_mock_data()
+    # 데이터 로드 (우리가 만든 통합 데이터만 사용)
+    @st.cache_data
+    def load_data():
+        import os
+        local_file = '2024_전기공사_통합데이터.xlsx'
+        
+        # 1. 파일이 있으면 로드
+        if os.path.exists(local_file):
+            try:
+                return pd.read_excel(local_file)
+            except Exception as e:
+                st.error(f"데이터 파일 로드 중 오류: {e}")
+                return None
+        
+        # 2. 파일이 없으면 (배포 시 누락 등) 대비용 가상 데이터
+        loader = MockDataLoader()
+        return loader.generate_mock_bids()
+
+    df = load_data()
 
     if df is not None:
         selected_agency = st.selectbox(
             "분석할 발주처를 선택하세요:",
             ["전체"] + list(df['발주처'].unique())
         )
-        st.info("💡 팁: 발주처마다 사정율 패턴이 다를 수 있으니, 입찰하려는 곳을 선택하는 게 정확합니다.")
+        st.info(f"💡 분석 대상: 총 {len(df)}건의 데이터가 준비되어 있습니다.")
     else:
         selected_agency = "전체"
-        st.warning("데이터를 업로드해주세요.")
+        st.error("데이터 파일을 찾을 수 없습니다. (2024_전기공사_통합데이터.xlsx)")
 
 analyzer = Analyzer()
 
