@@ -12,14 +12,12 @@ class Analyzer:
         stats = df['사정율'].describe()
         return stats
 
-    def calculate_winning_probability_ranges(self, df, base_price):
+    def calculate_winning_probability_ranges(self, df, base_price, limit_rate=87.745):
         """
         과거 사정율 분포를 기반으로, 어떤 사정율 구간이 가장 빈도가 높았는지 분석하여
         추천 투찰 금액을 계산합니다.
         
-        복수예비가격 15개 중 4개를 뽑아 평균을 내는 구조이므로,
-        사정율 분포는 주로 정규분포에 가깝거나, 특정 구간에 몰릴 수 있습니다.
-        여기서는 간단히 빈도수 상위 구간을 추천합니다.
+        limit_rate: 낙찰하한율 (예: 87.745, 86.745 등)
         """
         # 사정율 구간을 0.2% 단위로 나눕니다.
         bins = np.arange(97.0, 103.0, 0.2)
@@ -40,9 +38,9 @@ class Analyzer:
             # 예상 예정가격
             est_price = base_price * (rec_adj_rate / 100)
             
-            # 추천 투찰금액 (낙찰하한율 87.745% 기준 + 안전마진 0.01%p)
-            # 보통 예정가격의 87.745% 바로 위를 씁니다.
-            target_rate = 87.755 
+            # 추천 투찰금액 (낙찰하한율 + 안전마진 0.005%p for safety rounding)
+            # 보통 소수점 처리를 위해 아주 살짝 높게 씁니다.
+            target_rate = limit_rate + 0.005
             bid_price = int(est_price * (target_rate / 100))
             
             recommendations.append({

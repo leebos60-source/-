@@ -85,6 +85,24 @@ if df is not None:
                 step=1000000,
                 format="%d"
             )
+            
+        st.markdown("### 2. 낙찰하한율 설정 (중요!)")
+        st.info("보내주신 링크 내용처럼, 공사 규모에 따라 커트라인이 다릅니다.")
+        limit_rate_option = st.selectbox(
+            "적격심사 기준 (낙찰하한율)을 선택하세요:",
+            [
+                "87.745% (일반적인 전기공사 / 10억 미만)",
+                "86.745% (조금 큰 공사 / 10억~50억)",
+                "87.995% (더 작은 공사, 수의계약 등)",
+                "직접 입력"
+            ]
+        )
+        
+        if "직접 입력" in limit_rate_option:
+            custom_rate = st.number_input("하한율 직접 입력 (%)", value=87.745, format="%.3f")
+            limit_rate = custom_rate
+        else:
+            limit_rate = float(limit_rate_option.split('%')[0])
         
         if st.button("계산하기 🚀", use_container_width=True, type="primary"):
             # 분석 대상 데이터 필터링
@@ -92,9 +110,9 @@ if df is not None:
             if selected_agency != "전체":
                 filtered_df = df[df['발주처'] == selected_agency]
                 
-            recommendations = analyzer.calculate_winning_probability_ranges(filtered_df, base_price_input)
+            recommendations = analyzer.calculate_winning_probability_ranges(filtered_df, base_price_input, limit_rate)
             
-            st.markdown("### 2. 추천 입찰 금액입니다")
+            st.markdown("### 3. 추천 입찰 금액입니다")
         
             # 데이터 건수 확인 및 경고
             if len(filtered_df) < 30:
