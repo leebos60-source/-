@@ -39,7 +39,7 @@ class MockDataLoader:
             # 낙찰하한율 (87.745% 가정)
             drop_limit_rate = 87.745
             
-            # 낙찰율 (낙찰하한율보다 살짝 높게 형성)
+            # 낙찰률 (낙찰하한율보다 살짝 높게 형성)
             bid_rate = drop_limit_rate + np.random.exponential(0.1)
             winning_price = int(est_price * (bid_rate / 100))
             
@@ -51,7 +51,7 @@ class MockDataLoader:
                 '예정가격': est_price,
                 '낙찰금액': winning_price,
                 '사정율': round(adj_rate, 4), # 실제로는 역산해야 하지만 mock에서는 생성값 사용
-                '낙찰율': round(bid_rate, 4)
+                '낙찰률': round(bid_rate, 4)
             })
             
         return pd.DataFrame(data)
@@ -92,7 +92,7 @@ class FileDataLoader:
             '예정가격': ['예가', '예비가격'],
             '낙찰금액': ['투찰금액', '낙찰가'],
             '사정율': ['사정률', '예가율', '사정율(%)'],
-            '낙찰율': ['낙찰하한율', '투찰률'] # 주의: 낙찰하한율과 낙찰률은 다름
+            '낙찰률': ['낙찰하한율', '투찰률'] # 주의: 낙찰하한율과 낙찰률은 다름
         }
         
         # 컬럼 이름 변경
@@ -117,7 +117,7 @@ class FileDataLoader:
                  raise ValueError(f"필수 컬럼이 누락되었습니다: {', '.join(missing)}. '사정율' 또는 '예정가격' 정보가 반드시 필요합니다.")
 
         # 숫자 데이터 정제 (콤마 제거 등)
-        numeric_cols = ['기초금액', '예정가격', '낙찰금액', '사정율', '낙찰율']
+        numeric_cols = ['기초금액', '예정가격', '낙찰금액', '사정율', '낙찰률']
         for col in numeric_cols:
             if col in df.columns:
                 # 문자열인 경우에만 처리

@@ -64,7 +64,7 @@ def generate_realistic_data(n_rows=300):
             '예정가격': est_price,
             '낙찰금액': winning_price,
             '낙찰하한율': 87.745,
-            '투찰률': round(bid_rate, 4),
+            '낙찰률': round(bid_rate, 4),
             # '사정율' 컬럼은 계산 가능하므로 일부러 뺄 수도 있지만, 사용 편의를 위해 포함 (옵션)
             '사정율': round(adj_rate, 5) 
         })
