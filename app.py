@@ -59,10 +59,22 @@ with st.sidebar:
         import os
         local_file = '2024_전기공사_통합데이터.xlsx'
         
+        # 컬럼명 정규화 (율/률 혼용 문제 해결)
+        def normalize_columns(df):
+            column_mapping = {
+                '사정률': '사정율',
+                '낙찰률': '낙찰율',
+                '낙찰율': '낙찰율',
+                '낙찰하한률': '낙찰하한율',
+            }
+            df.columns = [column_mapping.get(col, col) for col in df.columns]
+            return df
+        
         # 1. 파일이 있으면 로드
         if os.path.exists(local_file):
             try:
-                return pd.read_excel(local_file)
+                df = pd.read_excel(local_file)
+                return normalize_columns(df)
             except Exception as e:
                 st.error(f"데이터 파일 로드 중 오류: {e}")
                 return None
@@ -209,7 +221,7 @@ if df is not None:
         
         st.markdown("### 📋 최근 낙찰 기록")
         st.dataframe(
-            filtered_df[['공고일', '공고명', '기초금액', '낙찰금액', '사정율', '낙찰률']].sort_values('공고일', ascending=False),
+            filtered_df[['공고일', '공고명', '기초금액', '낙찰금액', '사정율', '낙찰율']].sort_values('공고일', ascending=False),
             hide_index=True
         )
 else:
