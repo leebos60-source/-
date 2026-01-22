@@ -69,6 +69,30 @@ with st.sidebar:
 
 analyzer = Analyzer()
 
+
+# 숫자를 한글로 변환하는 헬퍼 함수
+def number_to_korean(number):
+    if number == 0:
+        return "0원"
+    
+    units = ["", "만", "억", "조", "경"]
+    result = []
+    
+    for i in range(len(units)):
+        if number == 0:
+            break
+        
+        part = number % 10000
+        if part > 0:
+            part_str = str(part)
+            if i > 0: # 만 단위 이상일 때만 '1' 생략 로직 등 고려 가능하나, 단순히 숫자+단위로 표기
+                pass 
+            result.append(f"{part}{units[i]}")
+            
+        number //= 10000
+        
+    return " ".join(reversed(result)) + "원"
+
 if df is not None:
     # 메인 기능 탭
     tab1, tab2 = st.tabs(["💰 입찰가 계산하기", "📊 지난 공사 분석"])
@@ -85,6 +109,10 @@ if df is not None:
                 step=1000000,
                 format="%d"
             )
+        
+        # 입력 금액 한글 표기 (즉시 반응)
+        korean_amount = number_to_korean(base_price_input)
+        st.info(f"📜 입력하신 금액은 **{base_price_input:,}원** ({korean_amount}) 입니다.")
             
         st.markdown("### 2. 낙찰하한율 설정 (중요!)")
         st.info("보내주신 링크 내용처럼, 공사 규모에 따라 커트라인이 다릅니다.")
