@@ -27,6 +27,22 @@ st.markdown("""
         border-left: 5px solid #1E3A8A;
         margin-bottom: 10px;
     }
+    
+    /* 입력란 라벨(제목) 글자 크기 키우기 */
+    .stSelectbox label p, .stNumberInput label p {
+        font-size: 20px !important;
+        font-weight: bold !important;
+        color: #1E3A8A !important;
+    }
+    
+    /* 선택박스 내부 글자 크기 키우기 */
+    div[data-baseweb="select"] > div {
+        font-size: 18px !important;
+    }
+    /* 드롭다운 메뉴 아이템 글자 크기 */
+    ul[data-baseweb="menu"] li {
+        font-size: 18px !important;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -112,7 +128,17 @@ if df is not None:
         
         # 입력 금액 한글 표기 (즉시 반응)
         korean_amount = number_to_korean(base_price_input)
-        st.info(f"📜 입력하신 금액은 **{base_price_input:,}원** ({korean_amount}) 입니다.")
+        st.markdown(f"""
+            <div style='background-color: #e8f4f8; padding: 15px; border-radius: 10px; margin: 10px 0;'>
+                <span style='font-size: 24px; font-weight: bold; color: #1E3A8A;'>
+                    {base_price_input:,} 원
+                </span>
+                <br>
+                <span style='font-size: 20px; color: #555;'>
+                    ({korean_amount})
+                </span>
+            </div>
+        """, unsafe_allow_html=True)
             
         st.markdown("### 2. 낙찰하한율 설정 (중요!)")
         st.info("보내주신 링크 내용처럼, 공사 규모에 따라 커트라인이 다릅니다.")
