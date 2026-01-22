@@ -209,7 +209,7 @@ if df is not None:
         
         st.markdown("### 📋 최근 낙찰 기록")
         st.dataframe(
-            filtered_df[['공고일', '공고명', '기초금액', '낙찰금액', '사정율', '낙찰율']].sort_values('공고일', ascending=False),
+            filtered_df[['공고일', '공고명', '기초금액', '낙찰금액', '사정율', '낙찰률']].sort_values('공고일', ascending=False),
             hide_index=True
         )
 else:
