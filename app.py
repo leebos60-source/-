@@ -91,6 +91,11 @@ with st.sidebar:
             ["전체"] + list(df['발주처'].unique())
         )
         st.info(f"💡 분석 대상: 총 {len(df)}건의 데이터가 준비되어 있습니다.")
+        
+        # [디버깅] 실제 컬럼명 확인 (사용자 요청)
+        with st.expander("🔍 데이터 컬럼 정보 확인"):
+            st.write("엑셀 파일의 실제 컬럼 목록:")
+            st.write(list(df.columns))
     else:
         selected_agency = "전체"
         st.error("데이터 파일을 찾을 수 없습니다. (2024_전기공사_통합데이터.xlsx)")
@@ -220,10 +225,19 @@ if df is not None:
         st.plotly_chart(fig, use_container_width=True)
         
         st.markdown("### 📋 최근 낙찰 기록")
-        st.dataframe(
-            filtered_df[['공고일', '공고명', '기초금액', '낙찰금액', '사정율', '낙찰율']].sort_values('공고일', ascending=False),
-            hide_index=True
-        )
+        
+        # 동적 컬럼 선택 로직 (KeyError 방지)
+        target_cols = ['공고일', '공고명', '기초금액', '낙찰금액', '사정율', '낙찰율']
+        available_cols = [col for col in target_cols if col in filtered_df.columns]
+        
+        if available_cols:
+            st.dataframe(
+                filtered_df[available_cols].sort_values('공고일', ascending=False) if '공고일' in available_cols else filtered_df[available_cols],
+                hide_index=True
+            )
+        else:
+            st.error("⚠️ 화면에 표시할 데이터 컬럼을 찾지 못했습니다.")
+            st.write("현재 데이터 컬럼:", list(filtered_df.columns))
 else:
     st.info("👈 왼쪽에서 '샘플 데이터 사용'을 선택하거나 엑셀 파일을 업로드해주세요.")
 
